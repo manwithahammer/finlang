@@ -1,4 +1,4 @@
--module(fs_bond).
+-module(fl_bond).
 
 -export([bond_price/3, bond_yield/3, test/0]).
 

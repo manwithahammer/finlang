@@ -51,33 +51,38 @@ bond_bracket_price(CashFlows, Price, Time, _Yleft, _Yright, _Iteration) ->
 	{bond_bracket_price_iterations_exceeded, {cashflows, CashFlows}, {price, Price}, {time, Time}}.
 
 test() ->
-	test_price(),
-	test_yield(),
-	test_consistency().
+	fl_test:many([
+		{"Price",			fun test_price/0},
+		{"Yield",			fun test_yield/0},
+		{"Consistency",		fun test_consistency/0}
+	]).
+
+format_output({Label, Value}) ->
+	format_output({Label, Value}, 20);
+format_output([{Label, Value} | Tail]) ->
+	format_output([{Label, Value} | Tail], 20).
+
+format_output({Label, Value}, Width) ->
+	io:format("~-" ++ integer_to_list(Width) ++ "s: ~p~n", [Label, Value]);
+format_output([{Label, Value} | Tail], Width) ->
+	format_output({Label, Value}, Width),
+	format_output(Tail, Width);
+format_output([], _Width) ->
+	ok.
 
 test_price() ->
 	CashFlows = [{2.5, 0.5}, {2.5, 1.0}, {100.0, 1.0}],
 	Yield = 0.02,
 	Time = 0.0,
 	Price = bond_price(CashFlows, Yield, Time),
-	io:format("~n==========================~n", []),
-	io:format("= test_price~n", []),
-	io:format("==========================~n", []),
-	io:format("CashFlows: ~p~n", [CashFlows]),
-	io:format("Yield: ~p~n", [Yield]),
-	io:format("Price: ~p~n", [Price]).
+	format_output([{"CashFlows", CashFlows}, {"Yield", Yield}, {"Price", Price}]).
 
 test_yield() ->
 	CashFlows = [{1.5, 0.5}, {1.5, 1.0}, {100.0, 1.0}],
 	Price = 102.0,
 	Time = 0.0,
 	Yield = bond_yield(CashFlows, Price, Time),
-	io:format("~n==========================~n", []),
-	io:format("= test_yield~n", []),
-	io:format("==========================~n", []),
-	io:format("CashFlows: ~p~n", [CashFlows]),
-	io:format("Price: ~p~n", [Price]),
-	io:format("Yield: ~p~n", [Yield]).
+	format_output([{"CashFlows", CashFlows}, {"Price", Price}, {"Yield", Yield}]).
 
 test_consistency() ->
 	CashFlows = [{1.5, 0.5}, {1.5, 1.0}, {100.0, 1.0}],
@@ -85,11 +90,5 @@ test_consistency() ->
 	Time = 0.0,
 	Yield = bond_yield(CashFlows, Price, Time),
 	Reprice = bond_price(CashFlows, Yield, Time),
-	io:format("~n==========================~n", []),
-	io:format("= test_consistency~n", []),
-	io:format("==========================~n", []),
-	io:format("CashFlows: ~p~n", [CashFlows]),
-	io:format("Price: ~p~n", [Price]),
-	io:format("Yield: ~p~n", [Yield]),
-	io:format("Reprice: ~p~n", [Reprice]),
-	io:format("Result: ~p\n", [case abs(Price - Reprice) < ?tolerance of true -> "Success"; false -> "Error" end]).
+	format_output([{"CashFlows", CashFlows}, {"Price", Price}, {"Yield:", Yield}, {"Reprice", Reprice},
+		{"Result", case abs(Price - Reprice) < ?tolerance of true -> "Success"; false -> "Error" end}]).

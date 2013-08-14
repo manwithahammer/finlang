@@ -1,7 +1,16 @@
 % c('test.erl').
 
 -module(fl_test).
--export([time_function/3, avg_time/4]).
+-export([time_function/3, avg_time/4, single/2, many/1]).
+
+many(Tests) ->
+	[fl_test:single(Name, Test) || {Name, Test} <- Tests].
+
+single(Name, Test) ->
+	io:format("=====================================================~n"),
+	io:format("= ~s~n", [Name]),
+	io:format("=====================================================~n"),
+	Test().
 
 time_function(Fun, N, M) ->
 	NN = lists:seq(1, N),

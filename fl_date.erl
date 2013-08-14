@@ -105,16 +105,10 @@ is_end_of_month({Year, Month, Day}) ->
 	end.
 
 test() ->
-	Tests = [
+	fl_test:many([
 		{"Parse",			fun test_parse/0},
 		{"Days In Month",	fun test_days_in_month/0}
-	],
-	[run_test(Name, Test) || {Name, Test} <- Tests].
-
-run_test(Name, Test) ->
-	io:format("Running test: ** ~-20s**~n", [Name]),
-	Test(),
-	io:format("=====================================================~n").
+	]).
 
 test_parse() ->
 	Dates = ["20120208", "02/08/2012", "2/08/2012", "02/8/2012", "02-08-2012", "2-08-2012", "02-8-2012", "8-feb-2012", "33/08/2012", "00/08/2012", "02/0/2012", "02/29/2012", "02/29/2013", "02/30/2012"] ++ [integer_to_list(Month) ++ "/35/2012" || Month <- lists:seq(1, 12)],
